@@ -1,6 +1,10 @@
-require("@nomicfoundation/hardhat-toolbox")
-require("./tasks")
+require("@nomiclabs/hardhat-waffle")
+require("hardhat-gas-reporter")
+require("@nomiclabs/hardhat-etherscan")
 require("dotenv").config()
+require("solidity-coverage")
+require("hardhat-deploy")
+
 
 const MAINNET_RPC_URL =
     process.env.MAINNET_RPC_URL ||
@@ -22,6 +26,15 @@ const REPORT_GAS = process.env.REPORT_GAS || false
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
+    namedAccounts: {
+        deployer: {
+            default: 0, // here this will by default take the first account as deployer
+            1: 0, // similarly on mainnet it will take the first account as deployer. Note though that depending on how hardhat network are configured, the account 0 on one network can be different than on another
+        },
+        player: {
+            default: 1,
+        },
+    },
     solidity: {
         compilers: [
             {
@@ -31,7 +44,10 @@ module.exports = {
                 version: "0.6.6",
             },
             {
-                version: "0.4.24",
+                version: "0.6.12",
+            },
+            {
+                version: "0.4.19",
             },
         ],
     },
@@ -42,7 +58,7 @@ module.exports = {
             forking: {
                 url: MAINNET_RPC_URL,
                 blockNumber: FORKING_BLOCK_NUMBER,
-                enabled: false,
+                enabled: true,
             },
             chainId: 31337,
         },
@@ -88,13 +104,7 @@ module.exports = {
     },
     contractSizer: {
         runOnCompile: false,
-        only: [
-            "APIConsumer",
-            "AutomationCounter",
-            "NFTFloorPriceConsumerV3",
-            "PriceConsumerV3",
-            "RandomNumberConsumerV2",
-        ],
+
     },
     paths: {
     sources: "./contracts",
